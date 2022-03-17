@@ -16,9 +16,8 @@
 package org.springframework.security.oauth2.provider.token.store.jwk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -40,54 +39,52 @@ class JwkSetConverterTests {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     void convertWhenJwkSetStreamIsNullThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("Invalid JWK Set Object.");
-        this.converter.convert(null);
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> this.converter.convert(null));
+        assertTrue(e.getMessage().contains("Invalid JWK Set Object."));
     }
 
     @Test
     void convertWhenJwkSetStreamIsEmptyThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("Invalid JWK Set Object.");
-        this.converter.convert(new ByteArrayInputStream(new byte[0]));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> this.converter.convert(new ByteArrayInputStream(new byte[0])));
+        assertTrue(e.getMessage().contains("Invalid JWK Set Object."));
     }
 
     @Test
     void convertWhenJwkSetStreamNotAnObjectThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("Invalid JWK Set Object.");
-        this.converter.convert(new ByteArrayInputStream("".getBytes()));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> this.converter.convert(new ByteArrayInputStream("".getBytes())));
+        assertTrue(e.getMessage().contains("Invalid JWK Set Object."));
     }
 
     @Test
     void convertWhenJwkSetStreamHasMissingKeysAttributeThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("Invalid JWK Set Object.");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<String, Object>();
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("Invalid JWK Set Object."));
     }
 
     @Test
     void convertWhenJwkSetStreamHasInvalidKeysAttributeThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("Invalid JWK Set Object. The JWK Set MUST have a keys attribute.");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        jwkSetObject.put(KEYS + "-invalid", new Map[0]);
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<String, Object>();
+            jwkSetObject.put(KEYS + "-invalid", new Map[0]);
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("Invalid JWK Set Object. The JWK Set MUST have a keys attribute."));
     }
 
     @Test
     void convertWhenJwkSetStreamHasInvalidJwkElementsThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("Invalid JWK Set Object. The JWK Set MUST have an array of JWK(s).");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        jwkSetObject.put(JwkAttributes.KEYS, "");
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<String, Object>();
+            jwkSetObject.put(JwkAttributes.KEYS, "");
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("Invalid JWK Set Object. The JWK Set MUST have an array of JWK(s)."));
     }
 
     @Test
@@ -118,12 +115,13 @@ class JwkSetConverterTests {
 
     @Test
     void convertWhenJwkSetStreamHasRSAJwkElementWithMissingKeyIdAttributeThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("kid is a required attribute for a JWK.");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        Map<String, Object> jwkObject = this.createJwkObject(JwkDefinition.KeyType.RSA, null, JwkDefinition.PublicKeyUse.SIG);
-        jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<String, Object>();
+            Map<String, Object> jwkObject = this.createJwkObject(JwkDefinition.KeyType.RSA, null, JwkDefinition.PublicKeyUse.SIG);
+            jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("kid is a required attribute for a JWK."));
     }
 
     @Test
@@ -147,32 +145,35 @@ class JwkSetConverterTests {
 
     @Test
     void convertWhenJwkSetStreamHasRSAJwkElementWithMissingModulusAttributeThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("n is a required attribute for a RSA JWK.");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        Map<String, Object> jwkObject = this.createJwkObject(JwkDefinition.KeyType.RSA, "key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.RS256);
-        jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<String, Object>();
+            Map<String, Object> jwkObject = this.createJwkObject(JwkDefinition.KeyType.RSA, "key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.RS256);
+            jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("n is a required attribute for a RSA JWK."));
     }
 
     @Test
     void convertWhenJwkSetStreamHasRSAJwkElementWithMissingExponentAttributeThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("e is a required attribute for a RSA JWK.");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        Map<String, Object> jwkObject = this.createJwkObject(JwkDefinition.KeyType.RSA, "key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.RS256, "AMh-pGAj9vX2gwFDyrXot1f2YfHgh8h0Qx6w9IqLL");
-        jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<>();
+            Map<String, Object> jwkObject = this.createJwkObject(JwkDefinition.KeyType.RSA, "key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.RS256, "AMh-pGAj9vX2gwFDyrXot1f2YfHgh8h0Qx6w9IqLL");
+            jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("e is a required attribute for a RSA JWK."));
     }
 
     @Test
     void convertWhenJwkSetStreamHasECJwkElementWithMissingKeyIdAttributeThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("kid is a required attribute for an EC JWK.");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        Map<String, Object> jwkObject = this.createEllipticCurveJwkObject(null, JwkDefinition.PublicKeyUse.SIG, null);
-        jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<String, Object>();
+            Map<String, Object> jwkObject = this.createEllipticCurveJwkObject(null, JwkDefinition.PublicKeyUse.SIG, null);
+            jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("kid is a required attribute for an EC JWK."));
     }
 
     @Test
@@ -196,32 +197,35 @@ class JwkSetConverterTests {
 
     @Test
     void convertWhenJwkSetStreamHasECJwkElementWithMissingXAttributeThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("x is a required attribute for an EC JWK.");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        Map<String, Object> jwkObject = this.createEllipticCurveJwkObject("key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.ES256);
-        jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<String, Object>();
+            Map<String, Object> jwkObject = this.createEllipticCurveJwkObject("key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.ES256);
+            jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("x is a required attribute for an EC JWK."));
     }
 
     @Test
     void convertWhenJwkSetStreamHasECJwkElementWithMissingYAttributeThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("y is a required attribute for an EC JWK.");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        Map<String, Object> jwkObject = this.createEllipticCurveJwkObject("key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.ES256, "IsxeG33-QlL2u-O38QKwAbw5tJTZ-jtMVSlzjNXhvys");
-        jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<String, Object>();
+            Map<String, Object> jwkObject = this.createEllipticCurveJwkObject("key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.ES256, "IsxeG33-QlL2u-O38QKwAbw5tJTZ-jtMVSlzjNXhvys");
+            jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("y is a required attribute for an EC JWK."));
     }
 
     @Test
     void convertWhenJwkSetStreamHasECJwkElementWithMissingCurveAttributeThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("crv is a required attribute for an EC JWK.");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        Map<String, Object> jwkObject = this.createEllipticCurveJwkObject("key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.ES256, "IsxeG33-QlL2u-O38QKwAbw5tJTZ-jtMVSlzjNXhvys", "FPTFJF1M0sNRlOVZIH4e1DoZ_hdg1OvF6BlP2QHmSCg");
-        jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<String, Object>();
+            Map<String, Object> jwkObject = this.createEllipticCurveJwkObject("key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.ES256, "IsxeG33-QlL2u-O38QKwAbw5tJTZ-jtMVSlzjNXhvys", "FPTFJF1M0sNRlOVZIH4e1DoZ_hdg1OvF6BlP2QHmSCg");
+            jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject });
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("crv is a required attribute for an EC JWK."));
     }
 
     @Test
@@ -246,12 +250,13 @@ class JwkSetConverterTests {
 
     @Test
     void convertWhenJwkSetStreamHasDuplicateJwkElementsThenThrowJwkException() throws Exception {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("Duplicate JWK found in Set: key-id-1 (kid)");
-        Map<String, Object> jwkSetObject = new HashMap<String, Object>();
-        Map<String, Object> jwkObject = this.createJwkObject(JwkDefinition.KeyType.RSA, "key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.RS256, "AMh-pGAj9vX2gwFDyrXot1f2YfHgh8h0Qx6w9IqLL", "AQAB");
-        jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject, jwkObject });
-        this.converter.convert(this.asInputStream(jwkSetObject));
+        JwkException e = Assertions.assertThrows(JwkException.class, () -> {
+            Map<String, Object> jwkSetObject = new HashMap<String, Object>();
+            Map<String, Object> jwkObject = this.createJwkObject(JwkDefinition.KeyType.RSA, "key-id-1", JwkDefinition.PublicKeyUse.SIG, JwkDefinition.CryptoAlgorithm.RS256, "AMh-pGAj9vX2gwFDyrXot1f2YfHgh8h0Qx6w9IqLL", "AQAB");
+            jwkSetObject.put(JwkAttributes.KEYS, new Map[] { jwkObject, jwkObject });
+            this.converter.convert(this.asInputStream(jwkSetObject));
+        });
+        assertTrue(e.getMessage().contains("Duplicate JWK found in Set: key-id-1 (kid)"));
     }
 
     private Map<String, Object> createJwkObject(JwkDefinition.KeyType keyType) {

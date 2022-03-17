@@ -16,8 +16,8 @@
 package org.springframework.security.oauth2.provider.token.store.jwk;
 
 import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
@@ -36,6 +36,7 @@ import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -49,9 +50,6 @@ import static org.powermock.api.mockito.PowerMockito.spy;
 class JwkTokenStoreTests {
 
     private JwkTokenStore jwkTokenStore = new JwkTokenStore("https://identity.server1.io/token_keys");
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     void readAuthenticationUsingOAuth2AccessTokenWhenCalledThenDelegateCalled() throws Exception {
@@ -156,60 +154,74 @@ class JwkTokenStoreTests {
 
     @Test
     void storeAccessTokenWhenCalledThenThrowJwkException() throws Exception {
-        this.setUpExpectedJwkException();
-        this.jwkTokenStore.storeAccessToken(null, null);
+        JwkException e = Assertions.assertThrows(JwkException.class, ()-> {
+            this.jwkTokenStore.storeAccessToken(null, null);
+        });
+        assertTrue(e.getMessage().contains("This operation is not supported."));
     }
 
     @Test
     void storeRefreshTokenWhenCalledThenThrowJwkException() throws Exception {
-        this.setUpExpectedJwkException();
-        this.jwkTokenStore.storeRefreshToken(null, null);
+        JwkException e = Assertions.assertThrows(JwkException.class, ()-> {
+            this.jwkTokenStore.storeRefreshToken(null, null);
+        });
+        assertTrue(e.getMessage().contains("This operation is not supported."));
     }
 
     @Test
     void readRefreshTokenWhenCalledThenThrowJwkException() throws Exception {
-        this.setUpExpectedJwkException();
-        this.jwkTokenStore.readRefreshToken(null);
+        JwkException e = Assertions.assertThrows(JwkException.class, ()-> {
+            this.jwkTokenStore.readRefreshToken(null);
+        });
+        assertTrue(e.getMessage().contains("This operation is not supported."));
     }
 
     @Test
     void readAuthenticationForRefreshTokenWhenCalledThenThrowJwkException() throws Exception {
-        this.setUpExpectedJwkException();
-        this.jwkTokenStore.readAuthenticationForRefreshToken(null);
+        JwkException e = Assertions.assertThrows(JwkException.class, ()-> {
+            this.jwkTokenStore.readAuthenticationForRefreshToken(null);
+        });
+        assertTrue(e.getMessage().contains("This operation is not supported."));
     }
 
     @Test
     void removeRefreshTokenWhenCalledThenThrowJwkException() throws Exception {
-        this.setUpExpectedJwkException();
-        this.jwkTokenStore.removeRefreshToken(null);
+        JwkException e = Assertions.assertThrows(JwkException.class, ()-> {
+            this.jwkTokenStore.removeRefreshToken(null);
+        });
+        assertTrue(e.getMessage().contains("This operation is not supported."));
     }
 
     @Test
     void removeAccessTokenUsingRefreshTokenWhenCalledThenThrowJwkException() throws Exception {
-        this.setUpExpectedJwkException();
-        this.jwkTokenStore.removeAccessTokenUsingRefreshToken(null);
+        JwkException e = Assertions.assertThrows(JwkException.class, ()-> {
+            this.jwkTokenStore.removeAccessTokenUsingRefreshToken(null);
+        });
+        assertTrue(e.getMessage().contains("This operation is not supported."));
     }
 
     @Test
     void getAccessTokenWhenCalledThenThrowJwkException() throws Exception {
-        this.setUpExpectedJwkException();
-        this.jwkTokenStore.getAccessToken(null);
+        JwkException e = Assertions.assertThrows(JwkException.class, ()-> {
+            this.jwkTokenStore.getAccessToken(null);
+        });
+        assertTrue(e.getMessage().contains("This operation is not supported."));
     }
 
     @Test
     void findTokensByClientIdAndUserNameWhenCalledThenThrowJwkException() throws Exception {
-        this.setUpExpectedJwkException();
-        this.jwkTokenStore.findTokensByClientIdAndUserName(null, null);
+        JwkException e = Assertions.assertThrows(JwkException.class, ()-> {
+            this.jwkTokenStore.findTokensByClientIdAndUserName(null, null);
+        });
+        assertTrue(e.getMessage().contains("This operation is not supported."));
     }
 
     @Test
     void findTokensByClientIdWhenCalledThenThrowJwkException() throws Exception {
-        this.setUpExpectedJwkException();
-        this.jwkTokenStore.findTokensByClientId(null);
+        JwkException e = Assertions.assertThrows(JwkException.class, ()-> {
+            this.jwkTokenStore.findTokensByClientId(null);
+        });
+        assertTrue(e.getMessage().contains("This operation is not supported."));
     }
 
-    private void setUpExpectedJwkException() {
-        this.thrown.expect(JwkException.class);
-        this.thrown.expectMessage("This operation is not supported.");
-    }
 }

@@ -14,13 +14,15 @@ package org.springframework.security.oauth2.config.annotation;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Collections;
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServletRequest;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,9 +80,6 @@ public class ResourceServerConfigurationTests {
     private OAuth2AccessToken token;
 
     private OAuth2Authentication authentication;
-
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
 
     @BeforeEach
     void init() {
@@ -167,16 +166,17 @@ public class ResourceServerConfigurationTests {
 
     @Test
     void testCustomExpressionHandler() throws Exception {
-        tokenStore.storeAccessToken(token, authentication);
-        AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
-        context.setServletContext(new MockServletContext());
-        context.register(ExpressionHandlerContext.class);
-        context.refresh();
-        MockMvc mvc = buildMockMvc(context);
-        expected.expect(IllegalArgumentException.class);
-        expected.expectMessage("#oauth2");
-        mvc.perform(MockMvcRequestBuilders.get("/").header("Authorization", "Bearer FOO")).andExpect(MockMvcResultMatchers.status().isUnauthorized());
-        context.close();
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, ()->{
+            tokenStore.storeAccessToken(token, authentication);
+            AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
+            context.setServletContext(new MockServletContext());
+            context.register(ExpressionHandlerContext.class);
+            context.refresh();
+            MockMvc mvc = buildMockMvc(context);
+            mvc.perform(MockMvcRequestBuilders.get("/").header("Authorization", "Bearer FOO")).andExpect(MockMvcResultMatchers.status().isUnauthorized());
+            context.close();
+        });
+        assertTrue(e.getMessage().contains("#oauth2"));
     }
 
     @Test

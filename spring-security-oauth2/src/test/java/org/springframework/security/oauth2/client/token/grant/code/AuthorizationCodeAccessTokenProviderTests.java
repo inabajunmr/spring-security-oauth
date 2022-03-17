@@ -15,8 +15,8 @@ package org.springframework.security.oauth2.client.token.grant.code;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.resource.UserRedirectRequiredException;
@@ -33,9 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Dave Syer
  */
 class AuthorizationCodeAccessTokenProviderTests {
-
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
 
     private MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
 
@@ -61,11 +58,12 @@ class AuthorizationCodeAccessTokenProviderTests {
 
     @Test
     void testGetAccessTokenFailsWithNoState() throws Exception {
-        AccessTokenRequest request = new DefaultAccessTokenRequest();
-        request.setAuthorizationCode("foo");
-        resource.setAccessTokenUri("http://localhost/oauth/token");
-        expected.expect(InvalidRequestException.class);
-        assertEquals("FOO", provider.obtainAccessToken(resource, request).getValue());
+        Assertions.assertThrows(InvalidRequestException.class, ()->{
+            AccessTokenRequest request = new DefaultAccessTokenRequest();
+            request.setAuthorizationCode("foo");
+            resource.setAccessTokenUri("http://localhost/oauth/token");
+            assertEquals("FOO", provider.obtainAccessToken(resource, request).getValue());
+        });
     }
 
     @Test

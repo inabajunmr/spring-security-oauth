@@ -8,10 +8,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.oauth2.common.DefaultExpiringOAuth2RefreshToken;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -32,9 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Dave Syer
  */
 class JwtTokenStoreTests {
-
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
 
     private JwtAccessTokenConverter enhancer = new JwtAccessTokenConverter();
 
@@ -93,17 +90,19 @@ class JwtTokenStoreTests {
 
     @Test
     void testAccessTokenIsNotARefreshToken() throws Exception {
-        DefaultOAuth2AccessToken original = new DefaultOAuth2AccessToken("FOO");
-        original.setExpiration(new Date());
-        DefaultOAuth2AccessToken token = (DefaultOAuth2AccessToken) enhancer.enhance(original, expectedAuthentication);
-        expected.expect(InvalidTokenException.class);
-        assertNull(tokenStore.readRefreshToken(token.getValue()));
+        Assertions.assertThrows(InvalidTokenException.class, () -> {
+            DefaultOAuth2AccessToken original = new DefaultOAuth2AccessToken("FOO");
+            original.setExpiration(new Date());
+            DefaultOAuth2AccessToken token = (DefaultOAuth2AccessToken) enhancer.enhance(original, expectedAuthentication);
+            assertNull(tokenStore.readRefreshToken(token.getValue()));
+        });
     }
 
     @Test
     void testRefreshTokenIsNotAnAccessToken() throws Exception {
-        expected.expect(InvalidTokenException.class);
-        assertNull(tokenStore.readAccessToken(expectedOAuth2RefreshToken.getValue()));
+        Assertions.assertThrows(InvalidTokenException.class, () -> {
+            assertNull(tokenStore.readAccessToken(expectedOAuth2RefreshToken.getValue()));
+        });
     }
 
     @Test

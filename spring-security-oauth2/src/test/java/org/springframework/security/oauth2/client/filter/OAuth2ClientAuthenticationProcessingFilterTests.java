@@ -22,9 +22,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import javax.servlet.ServletException;
-import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -49,9 +48,6 @@ class OAuth2ClientAuthenticationProcessingFilterTests {
     private OAuth2RestOperations restTemplate = Mockito.mock(OAuth2RestOperations.class);
 
     private OAuth2Authentication authentication;
-
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
 
     @Test
     void testAuthentication() throws Exception {
@@ -97,10 +93,11 @@ class OAuth2ClientAuthenticationProcessingFilterTests {
 
     @Test
     void testDeniedToken() throws Exception {
-        filter.setRestTemplate(restTemplate);
-        Mockito.when(restTemplate.getAccessToken()).thenThrow(new OAuth2Exception("User denied acess token"));
-        expected.expect(BadCredentialsException.class);
-        filter.attemptAuthentication(null, null);
+        Assertions.assertThrows(BadCredentialsException.class, ()-> {
+            filter.setRestTemplate(restTemplate);
+            Mockito.when(restTemplate.getAccessToken()).thenThrow(new OAuth2Exception("User denied acess token"));
+            filter.attemptAuthentication(null, null);
+        });
     }
 
     @Test

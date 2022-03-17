@@ -17,12 +17,14 @@ package org.springframework.security.oauth2.config.xml;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.beans.factory.parsing.BeanDefinitionParsingException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Dave Syer
@@ -30,9 +32,6 @@ import org.springframework.core.io.ByteArrayResource;
 class InvalidResourceBeanDefinitionParserTests {
 
     private ConfigurableApplicationContext context;
-
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
 
     @AfterEach
     void close() {
@@ -43,37 +42,42 @@ class InvalidResourceBeanDefinitionParserTests {
 
     @Test
     void testMissingTokenUriForClientCredentials() {
-        expected.expect(BeanDefinitionParsingException.class);
-        expected.expectMessage("accessTokenUri must be supplied");
-        loadContext("type='client_credentials'");
+        BeanDefinitionParsingException e = Assertions.assertThrows(BeanDefinitionParsingException.class, ()-> {
+            loadContext("type='client_credentials'");
+        });
+        assertTrue(e.getMessage().contains("accessTokenUri must be supplied"));
     }
 
     @Test
     void testMissingAuthorizationUriForImplicit() {
-        expected.expect(BeanDefinitionParsingException.class);
-        expected.expectMessage("authorization URI must be supplied");
-        loadContext("type='implicit'");
+        BeanDefinitionParsingException e = Assertions.assertThrows(BeanDefinitionParsingException.class, ()-> {
+            loadContext("type='implicit'");
+        });
+        assertTrue(e.getMessage().contains("authorization URI must be supplied"));
     }
 
     @Test
     void testMissingAuthorizationUriForAuthorizationCode() {
-        expected.expect(BeanDefinitionParsingException.class);
-        expected.expectMessage("authorization URI must be supplied");
-        loadContext("type='authorization_code' access-token-uri='https://somewhere.com'");
+        BeanDefinitionParsingException e = Assertions.assertThrows(BeanDefinitionParsingException.class, ()-> {
+            loadContext("type='authorization_code' access-token-uri='https://somewhere.com'");
+        });
+        assertTrue(e.getMessage().contains("authorization URI must be supplied"));
     }
 
     @Test
     void testMissingUsernameForPassword() {
-        expected.expect(BeanDefinitionParsingException.class);
-        expected.expectMessage("A username must be supplied on a resource element of type password");
-        loadContext("type='password' access-token-uri='https://somewhere.com'");
+        BeanDefinitionParsingException e = Assertions.assertThrows(BeanDefinitionParsingException.class, ()-> {
+            loadContext("type='password' access-token-uri='https://somewhere.com'");
+        });
+        assertTrue(e.getMessage().contains("A username must be supplied on a resource element of type password"));
     }
 
     @Test
     void testMissingPasswordForPassword() {
-        expected.expect(BeanDefinitionParsingException.class);
-        expected.expectMessage("A password must be supplied on a resource element of type password");
-        loadContext("type='password' username='admin' access-token-uri='https://somewhere.com'");
+        BeanDefinitionParsingException e = Assertions.assertThrows(BeanDefinitionParsingException.class, ()-> {
+            loadContext("type='password' username='admin' access-token-uri='https://somewhere.com'");
+        });
+        assertTrue(e.getMessage().contains("A password must be supplied on a resource element of type password"));
     }
 
     private void loadContext(String attributes) {

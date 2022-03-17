@@ -16,9 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Arrays;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,9 +33,6 @@ class DefaultTokenServicesAuthoritiesChangeTests {
     private DefaultTokenServices services;
 
     private InMemoryTokenStore tokenStore = new InMemoryTokenStore();
-
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
 
     @BeforeEach
     void setUp() throws Exception {

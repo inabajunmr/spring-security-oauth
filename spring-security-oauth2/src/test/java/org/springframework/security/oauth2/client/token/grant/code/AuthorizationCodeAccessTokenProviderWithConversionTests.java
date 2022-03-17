@@ -23,9 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -41,6 +40,7 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 /**
  * @author Dave Syer
@@ -132,9 +132,6 @@ class AuthorizationCodeAccessTokenProviderWithConversionTests {
         }
     }
 
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
-
     private ClientHttpRequestFactory requestFactory;
 
     private AuthorizationCodeAccessTokenProvider provider = new AuthorizationCodeAccessTokenProvider();
@@ -164,21 +161,18 @@ class AuthorizationCodeAccessTokenProviderWithConversionTests {
 
     @Test
     void testGetErrorFromJson() throws Exception {
-        final InvalidClientException exception = new InvalidClientException("FOO");
-        requestFactory = new ClientHttpRequestFactory() {
+        OAuth2AccessDeniedException e = Assertions.assertThrows(OAuth2AccessDeniedException.class, ()-> {
+            final InvalidClientException exception = new InvalidClientException("FOO");
+            requestFactory = (uri, httpMethod) -> new StubClientHttpRequest(HttpStatus.BAD_REQUEST, new ObjectMapper().writeValueAsString(exception));
+            AccessTokenRequest request = new DefaultAccessTokenRequest();
+            request.setAuthorizationCode("foo");
+            request.setPreservedState(new Object());
+            resource.setAccessTokenUri("http://localhost/oauth/token");
+            setUpRestTemplate();
+            provider.obtainAccessToken(resource, request);
+        });
+        assertInstanceOf(InvalidClientException.class, e.getCause());
 
-            public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
-                return new StubClientHttpRequest(HttpStatus.BAD_REQUEST, new ObjectMapper().writeValueAsString(exception));
-            }
-        };
-        AccessTokenRequest request = new DefaultAccessTokenRequest();
-        request.setAuthorizationCode("foo");
-        request.setPreservedState(new Object());
-        resource.setAccessTokenUri("http://localhost/oauth/token");
-        expected.expect(OAuth2AccessDeniedException.class);
-        expected.expect(hasCause(instanceOf(InvalidClientException.class)));
-        setUpRestTemplate();
-        provider.obtainAccessToken(resource, request);
     }
 
     @Test
@@ -202,22 +196,25 @@ class AuthorizationCodeAccessTokenProviderWithConversionTests {
 
     @Test
     void testGetErrorFromForm() throws Exception {
-        final HttpHeaders responseHeaders = new HttpHeaders();
-        responseHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        requestFactory = new ClientHttpRequestFactory() {
+        OAuth2AccessDeniedException e = Assertions.assertThrows(OAuth2AccessDeniedException.class, () -> {
+            final HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            requestFactory = new ClientHttpRequestFactory() {
 
-            public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
-                return new StubClientHttpRequest(HttpStatus.BAD_REQUEST, responseHeaders, "error=invalid_client&error_description=FOO");
-            }
-        };
-        AccessTokenRequest request = new DefaultAccessTokenRequest();
-        request.setAuthorizationCode("foo");
-        request.setPreservedState(new Object());
-        resource.setAccessTokenUri("http://localhost/oauth/token");
-        expected.expect(OAuth2AccessDeniedException.class);
-        expected.expect(hasCause(instanceOf(InvalidClientException.class)));
-        setUpRestTemplate();
-        provider.obtainAccessToken(resource, request);
+                public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
+                    return new StubClientHttpRequest(HttpStatus.BAD_REQUEST, responseHeaders, "error=invalid_client&error_description=FOO");
+                }
+            };
+            AccessTokenRequest request = new DefaultAccessTokenRequest();
+            request.setAuthorizationCode("foo");
+            request.setPreservedState(new Object());
+            resource.setAccessTokenUri("http://localhost/oauth/token");
+            setUpRestTemplate();
+            provider.obtainAccessToken(resource, request);
+        });
+
+        assertInstanceOf(InvalidClientException.class, e.getCause());
+
     }
 
     private Matcher<Throwable> hasCause(final Matcher<?> matcher) {

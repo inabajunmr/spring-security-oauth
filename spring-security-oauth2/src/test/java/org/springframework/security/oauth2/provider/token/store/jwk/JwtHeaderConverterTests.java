@@ -15,12 +15,12 @@
  */
 package org.springframework.security.oauth2.provider.token.store.jwk;
 
-import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.oauth2.provider.token.store.jwk.JwtTestUtil.createDefaultJwtPayload;
 import static org.springframework.security.oauth2.provider.token.store.jwk.JwtTestUtil.createJwt;
 
@@ -34,20 +34,20 @@ class JwtHeaderConverterTests {
 
     private final JwtHeaderConverter converter = new JwtHeaderConverter();
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     void convertWhenJwtTokenIsNullThenThrowNullPointerException() throws Exception {
-        this.thrown.expect(NullPointerException.class);
-        this.converter.convert(null);
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            this.converter.convert(null);
+        });
     }
 
     @Test
     void convertWhenJwtTokenInvalidThenThrowJwkException() throws Exception {
-        this.thrown.expect(InvalidTokenException.class);
-        this.thrown.expectMessage("Invalid JWT. Missing JOSE Header.");
-        this.converter.convert("");
+        InvalidTokenException e = Assertions.assertThrows(InvalidTokenException.class, () -> {
+            this.converter.convert("");
+        });
+        assertTrue(e.getMessage().contains("Invalid JWT. Missing JOSE Header."));
     }
 
     @Test
@@ -59,8 +59,9 @@ class JwtHeaderConverterTests {
 
     @Test
     void convertWhenJwtTokenWithMalformedHeaderThenThrowJwkException() throws Exception {
-        this.thrown.expect(InvalidTokenException.class);
-        this.thrown.expectMessage("Invalid JWT. Malformed JOSE Header.");
-        this.converter.convert("f." + new String(createDefaultJwtPayload()));
+        InvalidTokenException e = Assertions.assertThrows(InvalidTokenException.class, () -> {
+            this.converter.convert("f." + new String(createDefaultJwtPayload()));
+        });
+        assertTrue(e.getMessage().contains("Invalid JWT. Malformed JOSE Header."));
     }
 }

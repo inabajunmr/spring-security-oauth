@@ -3,6 +3,7 @@ package org.springframework.security.oauth2.common;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -55,25 +56,30 @@ class OAuth2AccessTokenJackson2SerializerTests extends BaseOAuth2AccessTokenJack
 
     @Test
     void writeValueAsStringWithNullScope() throws JsonGenerationException, JsonMappingException, IOException {
-        thrown.expect(JsonMappingException.class);
-        thrown.expectMessage("Scopes cannot be null or empty. Got [null]");
-        accessToken.getScope().clear();
-        try {
-            accessToken.getScope().add(null);
-        } catch (NullPointerException e) {
-            // short circuit NPE from Java 7 (which is correct but only relevant for this test)
-            throw new JsonMappingException("Scopes cannot be null or empty. Got [null]");
-        }
-        mapper.writeValueAsString(accessToken);
+        JsonMappingException e2 = Assertions.assertThrows(JsonMappingException.class, () -> {
+            accessToken.getScope().clear();
+            try {
+                accessToken.getScope().add(null);
+            } catch (NullPointerException e) {
+                // short circuit NPE from Java 7 (which is correct but only relevant for this test)
+                throw new JsonMappingException("Scopes cannot be null or empty. Got [null]");
+            }
+            mapper.writeValueAsString(accessToken);
+
+        });
+        assertEquals("Scopes cannot be null or empty. Got [null]", e2.getMessage());
     }
 
     @Test
     void writeValueAsStringWithEmptyStringScope() throws JsonGenerationException, JsonMappingException, IOException {
-        thrown.expect(JsonMappingException.class);
-        thrown.expectMessage("Scopes cannot be null or empty. Got []");
-        accessToken.getScope().clear();
-        accessToken.getScope().add("");
-        mapper.writeValueAsString(accessToken);
+        JsonMappingException e = Assertions.assertThrows(JsonMappingException.class, () -> {
+            accessToken.getScope().clear();
+            accessToken.getScope().add("");
+            mapper.writeValueAsString(accessToken);
+        });
+
+        assertEquals("Scopes cannot be null or empty. Got []", e.getMessage());
+
     }
 
     @Test
