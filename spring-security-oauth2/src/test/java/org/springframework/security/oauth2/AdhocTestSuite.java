@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.security.oauth2;
 
 import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -29,8 +29,7 @@ import org.springframework.security.oauth2.config.annotation.ResourceServerConfi
  * @author Dave Syer
  */
 @RunWith(Suite.class)
-@SuiteClasses({ AuthorizationServerConfigurationTests.class,  ResourceServerConfigurationTests.class })
+@SuiteClasses({ AuthorizationServerConfigurationTests.class, ResourceServerConfigurationTests.class })
 @Ignore
 public class AdhocTestSuite {
-
 }
