@@ -11,6 +11,7 @@ package org.springframework.security.oauth2.provider.token.store;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -248,7 +249,7 @@ public class JwtAccessTokenConverterTests {
 				+ "7kgz+HkCAwEAAQ==\n" + "-----END RSA PUBLIC KEY-----");
 		tokenEnhancer.afterPropertiesSet();
 		tokenEnhancer.decode("eyJhbGciOiJSUzI1NiJ9.eyJ1c2VyX25hbWUiOiJ0ZXN0MiIsImp0aSI6IkZPTyIsImNsaWVudF9pZCI6ImZvbyJ9.b43ob1ALSIwr_J2oEnfMhsXvYkr1qVBNhigNH2zlaE1OQLhLfT-DMlFtHcyUlyap0C2n0q61SPaGE_z715TV0uTAv2YKDN4fKZz2bMR7eHLsvaaCuvs7KCOi_aSROaUG");
-		verify(jwtClaimsSetVerifier).verify(anyMap());
+		verify(jwtClaimsSetVerifier).verify(ArgumentMatchers.<Map<String, Object>>any());
 	}
 
 	private OAuth2Request createOAuth2Request(String clientId, Set<String> scope) {
