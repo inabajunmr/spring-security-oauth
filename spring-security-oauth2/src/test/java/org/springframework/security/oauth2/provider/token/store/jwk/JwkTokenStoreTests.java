@@ -19,6 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -144,7 +145,7 @@ public class JwkTokenStoreTests {
 		ReflectionUtils.setField(field, spy, delegate);
 
 		OAuth2AccessToken accessToken = spy.readAccessToken("eyJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ==.eyJ1c2VyX25hbWUiOiJ0ZXN0MiIsImp0aSI6IkZPTyIsImNsaWVudF9pZCI6ImZvbyJ9.b43ob1ALSIwr_J2oEnfMhsXvYkr1qVBNhigNH2zlaE1OQLhLfT-DMlFtHcyUlyap0C2n0q61SPaGE_z715TV0uTAv2YKDN4fKZz2bMR7eHLsvaaCuvs7KCOi_aSROaUG");
-		verify(jwtClaimsSetVerifier).verify(anyMap());
+		verify(jwtClaimsSetVerifier).verify(ArgumentMatchers.<Map<String, Object>>any());
 	}
 
 

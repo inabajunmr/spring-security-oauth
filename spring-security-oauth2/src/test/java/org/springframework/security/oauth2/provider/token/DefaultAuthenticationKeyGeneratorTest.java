@@ -18,6 +18,7 @@ package org.springframework.security.oauth2.provider.token;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -51,7 +52,7 @@ public class DefaultAuthenticationKeyGeneratorTest {
     @Test
     public void shouldUseTheChecksumGeneratedByTheDigest() {
         when(auth.getOAuth2Request()).thenReturn(createRequest(CLIENT_ID));
-        when(generator.generateKey(anyMap())).thenReturn(CHECKSUM);
+        when(generator.generateKey(ArgumentMatchers.<Map<String, String>>any())).thenReturn(CHECKSUM);
 
         assertEquals(CHECKSUM, generator.extractKey(auth));
     }

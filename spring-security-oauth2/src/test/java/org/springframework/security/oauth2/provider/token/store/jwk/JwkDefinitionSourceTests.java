@@ -58,7 +58,7 @@ public class JwkDefinitionSourceTests {
 		mockStatic(JwkDefinitionSource.class);
 		when(JwkDefinitionSource.loadJwkDefinitions(any(URL.class))).thenReturn(Collections.<String, JwkDefinitionSource.JwkDefinitionHolder>emptyMap());
 		jwkDefinitionSource.getDefinitionLoadIfNecessary("invalid-key-id", null);
-		verifyStatic();
+		verifyStatic(JwkDefinitionSource.class);
 	}
 
 	// gh-1010
