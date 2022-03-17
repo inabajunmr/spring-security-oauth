@@ -15,6 +15,9 @@ package org.springframework.security.oauth2.config.xml;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -24,52 +27,41 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.security.oauth2.provider.endpoint.FrameworkEndpointHandlerMapping;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 /**
  * @author Dave Syer
  */
-@RunWith(Parameterized.class)
 class AuthorizationServerBeanDefinitionParserTests {
 
     private static final String CHECK_TOKEN_CUSTOM_ENDPOINT_RESOURCE = "authorization-server-check-token-custom-endpoint";
 
-    private ConfigurableApplicationContext context;
 
-    private String resource;
-
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
-
-    @Parameters
-    public static List<Object[]> parameters() {
-        return Arrays.asList(new Object[] { "authorization-server-vanilla" }, new Object[] { "authorization-server-extras" }, new Object[] { "authorization-server-types" }, new Object[] { "authorization-server-check-token" }, new Object[] { "authorization-server-disable" }, new Object[] { CHECK_TOKEN_CUSTOM_ENDPOINT_RESOURCE });
+    public static Stream<Arguments> parameters() {
+        return Stream.of(arguments( "authorization-server-vanilla" ), arguments( "authorization-server-extras" ), arguments( "authorization-server-types" ), arguments( "authorization-server-check-token"), arguments( "authorization-server-disable" ), arguments( CHECK_TOKEN_CUSTOM_ENDPOINT_RESOURCE ));
     }
 
-    public AuthorizationServerBeanDefinitionParserTests(String resource) {
-        this.resource = resource;
-        this.context = new GenericXmlApplicationContext(getClass(), resource + ".xml");
-    }
-
-    @AfterEach
-    void close() {
-        if (context != null) {
-            context.close();
-        }
-    }
-
-    @Test
-    void testDefaults() {
+    @ParameterizedTest
+    @MethodSource("parameters")
+    void testDefaults(String resource) {
+        GenericXmlApplicationContext context = new GenericXmlApplicationContext(getClass(), resource + ".xml");
         assertTrue(context.containsBeanDefinition("oauth2AuthorizationEndpoint"));
+        context.close();
     }
 
-    @Test
-    void testCheckTokenCustomEndpoint() {
-        if (!CHECK_TOKEN_CUSTOM_ENDPOINT_RESOURCE.equals(this.resource)) {
+    @ParameterizedTest
+    @MethodSource("parameters")
+    void testCheckTokenCustomEndpoint(String resource) {
+        GenericXmlApplicationContext context = new GenericXmlApplicationContext(getClass(), resource + ".xml");
+        if (!CHECK_TOKEN_CUSTOM_ENDPOINT_RESOURCE.equals(resource)) {
             return;
         }
         FrameworkEndpointHandlerMapping frameworkEndpointHandlerMapping = context.getBean(FrameworkEndpointHandlerMapping.class);
         assertNotNull(frameworkEndpointHandlerMapping);
         assertEquals("/custom_check_token", frameworkEndpointHandlerMapping.getPath("/oauth/check_token"));
+        context.close();
     }
 }

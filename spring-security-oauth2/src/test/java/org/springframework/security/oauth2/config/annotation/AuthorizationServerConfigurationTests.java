@@ -14,7 +14,11 @@ package org.springframework.security.oauth2.config.annotation;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.Rule;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -48,6 +52,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
@@ -84,55 +89,89 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 /**
  * @author Dave Syer
  */
-@RunWith(Parameterized.class)
 public class AuthorizationServerConfigurationTests {
 
-    private AnnotationConfigWebApplicationContext context;
-
-    @Rule
-    public ExpectedException expected = ExpectedException.none();
-
-    private Class<?>[] resources;
-
-    @Parameters
-    public static List<Object[]> parameters() {
-        return // @formatter:off
-        Arrays.// @formatter:off
-        asList(new Object[] { BeanCreationException.class, new Class<?>[] { AuthorizationServerUnconfigured.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerCycle.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerVanilla.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerDisableApproval.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerExtras.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerJdbc.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerEncoder.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerJwt.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerJwtCustomSigner.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerWithTokenServices.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerApproval.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerExceptionTranslator.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerCustomClientDetails.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerAllowsSpecificRequestMethods.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerAllowsOnlyPost.class } }, new Object[] { BeanCreationException.class, new Class<?>[] { AuthorizationServerTypes.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerCustomGranter.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerSslEnabled.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerCustomRedirectResolver.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerDefaultRedirectResolver.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerCustomAuthenticationProvidersOnTokenEndpoint.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerDefaultAuthenticationProviderOnTokenEndpoint.class } }, new Object[] { null, new Class<?>[] { AuthorizationServerCustomAuthenticationEventPublisher.class } });
+    public static Stream<Arguments> parameters() {
+        return Stream.of(arguments( BeanCreationException.class, new Class<?>[] { AuthorizationServerUnconfigured.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerCycle.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerVanilla.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerDisableApproval.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerExtras.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerJdbc.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerEncoder.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerJwt.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerJwtCustomSigner.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerWithTokenServices.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerApproval.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerExceptionTranslator.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerCustomClientDetails.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerAllowsSpecificRequestMethods.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerAllowsOnlyPost.class } ),
+                arguments(  BeanCreationException.class, new Class<?>[] { AuthorizationServerTypes.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerCustomGranter.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerSslEnabled.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerCustomRedirectResolver.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerDefaultRedirectResolver.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerCustomAuthenticationProvidersOnTokenEndpoint.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerDefaultAuthenticationProviderOnTokenEndpoint.class } ),
+                arguments(  null, new Class<?>[] { AuthorizationServerCustomAuthenticationEventPublisher.class } ));
     }
 
-    public AuthorizationServerConfigurationTests(Class<? extends Exception> error, Class<?>... resource) {
-        if (error != null) {
-            expected.expect(error);
-        }
-        this.resources = resource;
-        context = new AnnotationConfigWebApplicationContext();
-        context.setServletContext(new MockServletContext());
-        context.register(resource);
-    }
+    @ParameterizedTest
+    @MethodSource("parameters")
+    void testDefaults(Class<Exception> e, Class<?>[] c) {
+        if(e==null) {
+            AnnotationConfigWebApplicationContext context;
 
-    @AfterEach
-    void close() {
-        if (context != null) {
-            context.close();
-        }
-    }
+            Class<?>[] resources = c;
+            context = new AnnotationConfigWebApplicationContext();
+            context.setServletContext(new MockServletContext());
+            context.register(c);
 
-    @Test
-    void testDefaults() {
-        context.refresh();
-        assertTrue(context.containsBeanDefinition("authorizationEndpoint"));
-        assertNotNull(context.getBean("authorizationEndpoint", AuthorizationEndpoint.class));
-        for (Class<?> resource : resources) {
-            if (Runnable.class.isAssignableFrom(resource)) {
-                ((Runnable) context.getBean(resource)).run();
+            context.refresh();
+            assertTrue(context.containsBeanDefinition("authorizationEndpoint"));
+            assertNotNull(context.getBean("authorizationEndpoint", AuthorizationEndpoint.class));
+            for (Class<?> resource : resources) {
+                if (Runnable.class.isAssignableFrom(resource)) {
+                    ((Runnable) context.getBean(resource)).run();
+                }
             }
+
+            if (context != null) {
+                context.close();
+            }
+        } else {
+            Assertions.assertThrows(e, () -> {
+                AnnotationConfigWebApplicationContext context;
+
+                Class<?>[] resources = c;
+                context = new AnnotationConfigWebApplicationContext();
+                context.setServletContext(new MockServletContext());
+                context.register(c);
+
+                context.refresh();
+                assertTrue(context.containsBeanDefinition("authorizationEndpoint"));
+                assertNotNull(context.getBean("authorizationEndpoint", AuthorizationEndpoint.class));
+                for (Class<?> resource : resources) {
+                    if (Runnable.class.isAssignableFrom(resource)) {
+                        ((Runnable) context.getBean(resource)).run();
+                    }
+                }
+
+                if (context != null) {
+                    context.close();
+                }
+            });
         }
+
     }
 
     @Configuration
