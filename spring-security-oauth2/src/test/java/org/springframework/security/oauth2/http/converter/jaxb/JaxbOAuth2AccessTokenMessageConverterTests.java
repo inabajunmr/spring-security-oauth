@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2RefreshToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
@@ -30,7 +29,6 @@ import org.springframework.security.oauth2.common.DefaultOAuth2RefreshToken;
 /**
  * @author Rob Winch
  */
-@PrepareForTest(JaxbOAuth2AccessToken.class)
 class JaxbOAuth2AccessTokenMessageConverterTests extends BaseJaxbMessageConverterTest {
 
     private JaxbOAuth2AccessTokenMessageConverter converter;

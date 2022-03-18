@@ -19,10 +19,6 @@ import org.company.oauth2.CustomAuthentication;
 import org.company.oauth2.CustomOAuth2AccessToken;
 import org.company.oauth2.CustomOAuth2Authentication;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.common.DefaultExpiringOAuth2RefreshToken;
@@ -33,17 +29,13 @@ import org.springframework.security.oauth2.provider.RequestTokenFactory;
 import java.io.Serializable;
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.powermock.api.mockito.PowerMockito.spy;
-import static org.powermock.api.mockito.PowerMockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ SpringFactoriesLoader.class })
 class CustomSerializationStrategyTests {
 
     @Test
     void loadCustomSerializationStrategy() {
-        spy(SpringFactoriesLoader.class);
-        when(SpringFactoriesLoader.loadFactories(SerializationStrategy.class, SerializationUtils.class.getClassLoader())).thenReturn(Arrays.<SerializationStrategy>asList(new CustomSerializationStrategy()));
+        SerializationStrategy original = SerializationUtils.getSerializationStrategy();
+        SerializationUtils.setSerializationStrategy(new CustomSerializationStrategy());
         deserialize(new DefaultOAuth2AccessToken("access-token-" + UUID.randomUUID()));
         deserialize(new OAuth2Authentication(new OAuth2Request(Collections.<String, String>emptyMap(), "clientId", Collections.<GrantedAuthority>emptyList(), false, Collections.<String>emptySet(), new HashSet<String>(Arrays.asList("resourceId-1", "resourceId-2")), "redirectUri", Collections.<String>emptySet(), Collections.<String, Serializable>emptyMap()), new UsernamePasswordAuthenticationToken("test", "N/A")));
         deserialize(new DefaultExpiringOAuth2RefreshToken("access-token-" + UUID.randomUUID(), new Date()));
@@ -51,6 +43,7 @@ class CustomSerializationStrategyTests {
         deserialize(new HashMap<String, String>());
         deserialize(new CustomOAuth2AccessToken("xyz"));
         deserialize(new CustomOAuth2Authentication(RequestTokenFactory.createOAuth2Request("id", false), new CustomAuthentication("test", false)));
+        SerializationUtils.setSerializationStrategy(original);
     }
 
     private void deserialize(Object object) {

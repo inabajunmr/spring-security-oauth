@@ -13,20 +13,19 @@
 package org.springframework.security.oauth2.http.converter.jaxb;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.util.Date;
 import javax.xml.bind.JAXBContext;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.internal.WhiteboxImpl;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -35,8 +34,7 @@ import org.springframework.http.MediaType;
 /**
  * @author Rob Winch
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(System.class)
+@ExtendWith(MockitoExtension.class)
 abstract class BaseJaxbMessageConverterTest {
 
     protected static final String OAUTH_ACCESSTOKEN_NOEXPIRES = "<oauth><access_token>SlAV32hkKG</access_token></oauth>";
@@ -86,10 +84,13 @@ abstract class BaseJaxbMessageConverterTest {
         return output.toString("UTF-8");
     }
 
-    protected void useMockJAXBContext(Object object, Class<?> jaxbClassToBeBound) throws Exception {
+    protected void useMockJAXBContext(AbstractJaxbMessageConverter object, Class<?> jaxbClassToBeBound) throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(jaxbClassToBeBound);
         when(context.createMarshaller()).thenReturn(jaxbContext.createMarshaller());
         when(context.createUnmarshaller()).thenReturn(jaxbContext.createUnmarshaller());
-        WhiteboxImpl.setInternalState(object, JAXBContext.class, context);
+        Field field = AbstractJaxbMessageConverter.class.getField("context");
+        field.setAccessible(true);
+        field.set(object, context);
+//        WhiteboxImpl.setInternalState(object, JAXBContext.class, context);
     }
 }

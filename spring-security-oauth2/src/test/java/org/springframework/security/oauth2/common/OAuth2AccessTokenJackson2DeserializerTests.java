@@ -17,20 +17,19 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests deserialization of an {@link org.springframework.security.oauth2.common.OAuth2AccessToken} using jackson.
  *
  * @author Rob Winch
  */
-@PrepareForTest(OAuth2AccessTokenJackson2Deserializer.class)
 class OAuth2AccessTokenJackson2DeserializerTests extends BaseOAuth2AccessTokenJacksonTest {
 
     protected ObjectMapper mapper;
@@ -126,7 +125,7 @@ class OAuth2AccessTokenJackson2DeserializerTests extends BaseOAuth2AccessTokenJa
         if (expectedExpiration == null) {
             assertNull(actual.getExpiration());
         } else {
-            assertEquals(expectedExpiration.getTime(), actual.getExpiration().getTime());
+            assertTrue(Math.abs(expectedExpiration.getTime() - actual.getExpiration().getTime()) < 1000);
         }
         assertEquals(expected.getAdditionalInformation(), actual.getAdditionalInformation());
     }

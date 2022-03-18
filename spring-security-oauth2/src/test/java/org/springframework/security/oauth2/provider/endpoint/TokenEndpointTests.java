@@ -29,10 +29,12 @@ import java.util.HashSet;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -57,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author Dave Syer
  * @author Rob Winch
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 class TokenEndpointTests {
 
     @Mock

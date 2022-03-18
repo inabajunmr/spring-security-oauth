@@ -19,16 +19,14 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.oauth2.common.exceptions.*;
 
 /**
  * @author Rob Winch
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ System.class, JaxbOAuth2AccessToken.class })
+@ExtendWith(MockitoExtension.class)
 class JaxbOAuth2ExceptionMessageConverterTests extends BaseJaxbMessageConverterTest {
 
     private JaxbOAuth2ExceptionMessageConverter converter;

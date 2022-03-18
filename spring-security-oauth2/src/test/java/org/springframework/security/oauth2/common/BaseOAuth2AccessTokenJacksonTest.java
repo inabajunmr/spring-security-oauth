@@ -13,8 +13,7 @@
 package org.springframework.security.oauth2.common;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.mockito.Mockito.lenient;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -22,18 +21,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Base class for testing Jackson serialization and deserialization of {@link OAuth2AccessToken}.
  *
  * @author Rob Winch
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ System.class })
+@ExtendWith(MockitoExtension.class)
 abstract class BaseOAuth2AccessTokenJacksonTest {
 
     protected static final String ACCESS_TOKEN_EMPTYSCOPE = "{\"access_token\":\"token-value\",\"token_type\":\"bearer\",\"refresh_token\":\"refresh-value\",\"expires_in\":10,\"scope\":\"\"}";
@@ -67,11 +65,9 @@ abstract class BaseOAuth2AccessTokenJacksonTest {
 
     @BeforeEach
     void setUp() {
-        mockStatic(System.class);
-        long now = 1323123715041L;
-        when(System.currentTimeMillis()).thenReturn(now);
-        when(expiration.before(any(Date.class))).thenReturn(false);
-        when(expiration.getTime()).thenReturn(now + 10000);
+        long now = System.currentTimeMillis();
+        lenient().when(expiration.before(any(Date.class))).thenReturn(false);
+        lenient().when(expiration.getTime()).thenReturn(now + 10999);
         accessToken = new DefaultOAuth2AccessToken("token-value");
         accessToken.setExpiration(expiration);
         DefaultOAuth2RefreshToken refreshToken = new DefaultOAuth2RefreshToken("refresh-value");

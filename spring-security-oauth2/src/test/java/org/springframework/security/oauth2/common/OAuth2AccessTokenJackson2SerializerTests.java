@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author Rob Winch
  */
-@PrepareForTest(OAuth2AccessTokenJackson2Serializer.class)
 class OAuth2AccessTokenJackson2SerializerTests extends BaseOAuth2AccessTokenJacksonTest {
 
     protected ObjectMapper mapper;

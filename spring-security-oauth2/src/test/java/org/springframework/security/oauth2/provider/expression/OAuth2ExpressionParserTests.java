@@ -3,8 +3,10 @@ package org.springframework.security.oauth2.provider.expression;
 import static org.mockito.Mockito.verify;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
@@ -13,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author Rob Winch
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 class OAuth2ExpressionParserTests {
 
     @Mock

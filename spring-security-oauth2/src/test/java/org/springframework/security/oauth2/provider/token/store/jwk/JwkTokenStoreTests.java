@@ -18,12 +18,12 @@ package org.springframework.security.oauth2.provider.token.store.jwk;
 import org.junit.Rule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.security.jwt.crypto.sign.SignatureVerifier;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -40,13 +40,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.powermock.api.mockito.PowerMockito.spy;
 
 /**
  * @author Joe Grandja
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(JwkTokenStore.class)
+@ExtendWith(MockitoExtension.class)
 class JwkTokenStoreTests {
 
     private JwkTokenStore jwkTokenStore = new JwkTokenStore("https://identity.server1.io/token_keys");
