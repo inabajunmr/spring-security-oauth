@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -51,13 +52,13 @@ class DefaultAuthenticationKeyGeneratorTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        when(auth.getName()).thenReturn(USERNAME);
+        lenient().when(auth.getName()).thenReturn(USERNAME);
     }
 
     @Test
     void shouldUseTheChecksumGeneratedByTheDigest() {
         when(auth.getOAuth2Request()).thenReturn(createRequest(CLIENT_ID));
-        when(generator.generateKey(ArgumentMatchers.<Map<String, String>>any())).thenReturn(CHECKSUM);
+        when(generator.generateKey(ArgumentMatchers.any())).thenReturn(CHECKSUM);
         assertEquals(CHECKSUM, generator.extractKey(auth));
     }
 

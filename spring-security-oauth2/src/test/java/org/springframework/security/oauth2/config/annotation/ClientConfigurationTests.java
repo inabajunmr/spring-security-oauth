@@ -28,6 +28,7 @@ import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
 import org.springframework.security.oauth2.client.token.AccessTokenRequest;
+import org.springframework.security.oauth2.client.token.DefaultAccessTokenRequest;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.OAuth2ClientConfiguration;
 import org.springframework.stereotype.Controller;
@@ -52,7 +53,8 @@ class ClientConfigurationTests {
         context.register(ClientContext.class);
         context.refresh();
         MockMvc mvc = MockMvcBuilders.webAppContextSetup(context).addFilters(new OAuth2ClientContextFilter()).build();
-        mvc.perform(MockMvcRequestBuilders.get("/photos")).andExpect(MockMvcResultMatchers.status().isFound()).andExpect(MockMvcResultMatchers.header().string("Location", CoreMatchers.startsWith("https://example.com/authorize")));
+        mvc.perform(MockMvcRequestBuilders.get("/photos")).andExpect(MockMvcResultMatchers.status().isFound())
+                .andExpect(MockMvcResultMatchers.header().string("Location", CoreMatchers.startsWith("https://example.com/authorize")));
         context.close();
     }
 
@@ -62,9 +64,6 @@ class ClientConfigurationTests {
     @Import(OAuth2ClientConfiguration.class)
     protected static class ClientContext {
 
-        @Resource
-        @Qualifier("accessTokenRequest")
-        private AccessTokenRequest accessTokenRequest;
 
         @RequestMapping("/photos")
         @ResponseBody
@@ -80,7 +79,7 @@ class ClientConfigurationTests {
             resource.setClientId("client");
             resource.setAccessTokenUri("https://example.com/token");
             resource.setUserAuthorizationUri("https://example.com/authorize");
-            return new OAuth2RestTemplate(resource, new DefaultOAuth2ClientContext(accessTokenRequest));
+            return new OAuth2RestTemplate(resource, new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest()));
         }
     }
 }

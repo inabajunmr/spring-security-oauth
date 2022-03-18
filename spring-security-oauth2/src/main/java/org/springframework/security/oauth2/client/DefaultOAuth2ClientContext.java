@@ -25,7 +25,7 @@ public class DefaultOAuth2ClientContext implements OAuth2ClientContext, Serializ
 
 	private AccessTokenRequest accessTokenRequest;
 
-	private Map<String, Object> state = new HashMap<String, Object>();
+	private Map<String, Object> state = new HashMap<>();
 
 	public DefaultOAuth2ClientContext() {
 		this(new DefaultAccessTokenRequest());

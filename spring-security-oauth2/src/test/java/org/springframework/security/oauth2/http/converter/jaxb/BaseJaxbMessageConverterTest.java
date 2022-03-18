@@ -13,6 +13,7 @@
 package org.springframework.security.oauth2.http.converter.jaxb;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
@@ -64,16 +65,14 @@ abstract class BaseJaxbMessageConverterTest {
 
     @BeforeEach
     final void setUp() throws Exception {
-        mockStatic(System.class);
-        long now = 1323123715041L;
-        when(System.currentTimeMillis()).thenReturn(now);
-        when(expiration.before(any(Date.class))).thenReturn(false);
-        when(expiration.getTime()).thenReturn(now + 10000);
+        long now = System.currentTimeMillis();
+        lenient().when(expiration.before(any(Date.class))).thenReturn(false);
+        lenient().when(expiration.getTime()).thenReturn(now + 10999);
         output = new ByteArrayOutputStream();
         contentType = MediaType.APPLICATION_XML;
-        when(headers.getContentType()).thenReturn(contentType);
-        when(outputMessage.getHeaders()).thenReturn(headers);
-        when(outputMessage.getBody()).thenReturn(output);
+        lenient().when(headers.getContentType()).thenReturn(contentType);
+        lenient().when(outputMessage.getHeaders()).thenReturn(headers);
+        lenient().when(outputMessage.getBody()).thenReturn(output);
     }
 
     protected InputStream createInputStream(String in) throws UnsupportedEncodingException {
@@ -86,11 +85,10 @@ abstract class BaseJaxbMessageConverterTest {
 
     protected void useMockJAXBContext(AbstractJaxbMessageConverter object, Class<?> jaxbClassToBeBound) throws Exception {
         JAXBContext jaxbContext = JAXBContext.newInstance(jaxbClassToBeBound);
-        when(context.createMarshaller()).thenReturn(jaxbContext.createMarshaller());
-        when(context.createUnmarshaller()).thenReturn(jaxbContext.createUnmarshaller());
-        Field field = AbstractJaxbMessageConverter.class.getField("context");
+        lenient().when(context.createMarshaller()).thenReturn(jaxbContext.createMarshaller());
+        lenient().when(context.createUnmarshaller()).thenReturn(jaxbContext.createUnmarshaller());
+        Field field = AbstractJaxbMessageConverter.class.getDeclaredField("context");
         field.setAccessible(true);
         field.set(object, context);
-//        WhiteboxImpl.setInternalState(object, JAXBContext.class, context);
     }
 }

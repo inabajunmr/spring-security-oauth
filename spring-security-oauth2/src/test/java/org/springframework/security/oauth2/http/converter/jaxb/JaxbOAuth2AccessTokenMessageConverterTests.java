@@ -14,6 +14,8 @@ package org.springframework.security.oauth2.http.converter.jaxb;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,7 +70,7 @@ class JaxbOAuth2AccessTokenMessageConverterTests extends BaseJaxbMessageConverte
     @Test
     void writeCreatesNewMarshaller() throws Exception {
         useMockJAXBContext(converter, JaxbOAuth2AccessToken.class);
-        when(inputMessage.getBody()).thenReturn(createInputStream(OAUTH_ACCESSTOKEN));
+        lenient().when(inputMessage.getBody()).thenReturn(createInputStream(OAUTH_ACCESSTOKEN));
         converter.write(accessToken, contentType, outputMessage);
         verify(context).createMarshaller();
         converter.write(accessToken, contentType, outputMessage);
@@ -125,7 +127,7 @@ class JaxbOAuth2AccessTokenMessageConverterTests extends BaseJaxbMessageConverte
         if (expectedExpiration == null) {
             assertNull(actual.getExpiration());
         } else {
-            assertEquals(expectedExpiration.getTime(), actual.getExpiration().getTime());
+            assertTrue(Math.abs(expectedExpiration.getTime() - actual.getExpiration().getTime()) < 1000);
         }
     }
 }
