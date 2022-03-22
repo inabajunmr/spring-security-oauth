@@ -18,6 +18,7 @@ package org.springframework.security.oauth2.provider.token.store.jwk;
 import org.apache.commons.codec.Charsets;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.jwt.codec.Codecs;
 import org.springframework.security.jwt.crypto.sign.SignatureVerifier;
@@ -57,10 +58,10 @@ class JwkDefinitionSourceTests {
     @Test
     void getDefinitionLoadIfNecessaryWhenKeyIdNotFoundThenLoadJwkDefinitions() throws Exception {
         JwkDefinitionSource jwkDefinitionSource = spy(new JwkDefinitionSource(DEFAULT_JWK_SET_URL));
-        mockStatic(JwkDefinitionSource.class);
+        MockedStatic<JwkDefinitionSource> mock = mockStatic(JwkDefinitionSource.class);
         when(JwkDefinitionSource.loadJwkDefinitions(any(URL.class))).thenReturn(Collections.<String, JwkDefinitionSource.JwkDefinitionHolder>emptyMap());
         jwkDefinitionSource.getDefinitionLoadIfNecessary("invalid-key-id", null);
-//        verifyStatic(JwkDefinitionSource.class);
+        mock.close();
     }
 
     // gh-1010

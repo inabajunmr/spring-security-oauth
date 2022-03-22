@@ -30,7 +30,9 @@ import org.springframework.security.oauth2.provider.OAuth2Request;
 import java.io.Serializable;
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -58,7 +60,7 @@ class DefaultAuthenticationKeyGeneratorTest {
     @Test
     void shouldUseTheChecksumGeneratedByTheDigest() {
         when(auth.getOAuth2Request()).thenReturn(createRequest(CLIENT_ID));
-        when(generator.generateKey(ArgumentMatchers.any())).thenReturn(CHECKSUM);
+        doReturn(CHECKSUM).when(generator).generateKey(any());
         assertEquals(CHECKSUM, generator.extractKey(auth));
     }
 

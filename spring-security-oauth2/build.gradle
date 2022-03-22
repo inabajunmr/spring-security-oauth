@@ -32,26 +32,18 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.10.5'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.5.1'
     implementation 'org.apache.httpcomponents:httpclient:4.5.13'
-    implementation 'junit:junit:4.12'
-//    testImplementation('org.springframework.boot:spring-boot-starter-test:2.2.13.RELEASE')
 
     testImplementation(platform("org.junit:junit-bom:5.8.2"))
 
     testImplementation("org.junit.jupiter:junit-jupiter") {
         because 'allows to write and run Jupiter tests'
     }
-
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine") {
-        because 'allows JUnit 3 and JUnit 4 tests to run'
-    }
-
     testRuntimeOnly("org.junit.platform:junit-platform-launcher") {
         because 'allows tests to run from IDEs that bundle older version of launcher'
     }
 
     testImplementation 'org.springframework:spring-test:5.0.16.RELEASE'
     testImplementation 'com.squareup.okhttp3:mockwebserver:3.7.0'
-//    testImplementation 'org.mockito:mockito-core:2.23.4'
     testImplementation 'org.mockito:mockito-inline:3.6.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:3.6.0'
 

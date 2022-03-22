@@ -14,8 +14,6 @@ package org.springframework.security.oauth2.http.converter.jaxb;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
